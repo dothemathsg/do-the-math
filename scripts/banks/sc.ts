@@ -1,88 +1,86 @@
-import FirecrawlApp from "@mendable/firecrawl-js";
-import { z } from "zod";
+import { chromium } from "playwright";
 import type { MortgageRateInsert } from "../types";
 
-// Standard Chartered Singapore does not publish current mortgage rates for new
-// purchases on their public website. The MortgageOne product page only shows
-// an interactive calculator with blank rate input fields. The loanrepricing
-// page has some indicative rates for existing customers repricing their loans,
-// but no new-purchase package rates are publicly available.
-
-const RateSchema = z.object({
-  rates: z.array(
-    z.object({
-      product_name: z.string(),
-      interest_rate: z.number(),
-      lock_in_years: z.number(),
-      notes: z.string().optional(),
-    })
-  ),
-});
-
-const extractSchema = {
-  type: "object",
-  properties: {
-    rates: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          product_name: { type: "string" },
-          interest_rate: { type: "number" },
-          lock_in_years: { type: "number" },
-          notes: { type: "string" },
-        },
-        required: ["product_name", "interest_rate", "lock_in_years"],
-      },
-    },
-  },
-  required: ["rates"],
-};
-
-const MIN_VALID_RATE = 0.5;
-const MAX_VALID_RATE = 8.0;
+// SC publishes SORA rates on their /borrow/mortgages/sora/ page in a plain
+// HTML table. Structure:
+//   <tr><td colspan="2">3M Compounded SORA*</td></tr>   ← header
+//   <tr><td>Year 1</td><td>3M Compounded SORA + 1.00% p.a.</td></tr>
+//   <tr><td>Lock-in Period</td><td>2 years</td></tr>
+// All years share the same spread, so we collapse into one entry per package.
 
 export async function scrapeStandardChartered(): Promise<MortgageRateInsert[]> {
-  const apiKey = process.env.FIRECRAWL_API_KEY;
-  if (!apiKey) throw new Error("Missing FIRECRAWL_API_KEY in environment");
+  const browser = await chromium.launch({ headless: true });
 
-  const app = new FirecrawlApp({ apiKey });
+  try {
+    const page = await browser.newPage();
+    await page.goto("https://www.sc.com/sg/borrow/mortgages/sora/", {
+      waitUntil: "domcontentloaded",
+    });
+    await page.waitForTimeout(4000);
 
-  const result = await app.scrape(
-    "https://www.sc.com/sg/borrow/mortgages/loanrepricing/",
-    {
-      formats: [
-        {
-          type: "json",
-          schema: extractSchema,
-          prompt:
-            "Extract all home loan packages. For each package include: product_name (e.g. '2-Year Fixed Rate'), interest_rate as a decimal number (e.g. 3.68), lock_in_years as an integer, and any notes (promotional conditions, cashback, etc.).",
-        },
-      ],
-      waitFor: 3000,
-    }
-  );
-
-  if (!result.json) {
-    throw new Error("Standard Chartered scrape returned no structured data");
-  }
-
-  const parsed = RateSchema.parse(result.json);
-
-  const valid = parsed.rates.filter(
-    (r) => r.interest_rate >= MIN_VALID_RATE && r.interest_rate <= MAX_VALID_RATE
-  );
-  if (valid.length === 0) {
-    throw new Error(
-      "Standard Chartered does not publish current mortgage rates on their public website"
+    const tableRows = await page.evaluate(() =>
+      Array.from(document.querySelectorAll("table tbody")).map((tbody) =>
+        Array.from(tbody.querySelectorAll("tr")).map((tr) =>
+          Array.from(tr.querySelectorAll("td")).map((td) => td.textContent?.trim() ?? "")
+        )
+      )
     );
-  }
 
-  return valid.map((r) => ({
-    bank: "Standard Chartered",
-    product_name: r.product_name,
-    interest_rate: r.interest_rate,
-    lock_in_years: r.lock_in_years,
-    notes: r.notes ?? null,
-  }));
+    const rates: MortgageRateInsert[] = [];
+
+    for (const rows of tableRows) {
+      let spread: number | null = null;
+      let lockInYears: number | null = null;
+      let packageName = "3M COMPOUNDED SORA";
+
+      for (const cells of rows) {
+        if (cells.length === 0) continue;
+
+        const first = cells[0];
+        const second = cells[1] ?? "";
+
+        // Header row: spans 2 cols, contains package name
+        if (cells.length === 1 || (cells.length === 2 && !second)) {
+          if (/SORA/i.test(first)) packageName = first.replace(/\*+$/, "").trim();
+          continue;
+        }
+
+        // Rate row: "Year N" or "Thereafter" + "3M Compounded SORA + X% p.a."
+        if (/Year\s+\d+|Thereafter/i.test(first)) {
+          const m = second.match(/SORA\s*\+\s*(\d+\.\d+)%/i);
+          if (m && spread === null) spread = parseFloat(m[1]);
+          continue;
+        }
+
+        // Lock-in row: "Lock-in Period" + "N years"
+        if (/lock.?in/i.test(first)) {
+          const m = second.match(/(\d+)/);
+          if (m) lockInYears = parseInt(m[1]);
+        }
+      }
+
+      if (spread === null) continue;
+
+      const spreadStr = spread.toFixed(2);
+      const lockIn = lockInYears ?? 0;
+
+      rates.push({
+        bank: "Standard Chartered",
+        product_name: `${packageName} + ${spreadStr}%`,
+        interest_rate: spread,
+        lock_in_years: lockIn,
+        notes: `Variable rate linked to ${packageName}. ${lockIn > 0 ? `${lockIn}-year lock-in.` : ""} Min loan S$100,000.`.trim(),
+      });
+    }
+
+    if (rates.length === 0) {
+      throw new Error(
+        "Standard Chartered: no rates found — table structure on /borrow/mortgages/sora/ may have changed"
+      );
+    }
+
+    return rates;
+  } finally {
+    await browser.close();
+  }
 }
