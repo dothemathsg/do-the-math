@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/table";
 import { createServerClient } from "@/supabase/server";
 import { calculateMonthlyPayment, calculateTotalPayment } from "@/lib/mortgage";
+import { fetchSoraRate } from "@/lib/sora";
 import type { MortgageRate } from "@/supabase/types";
 
 const LOAN_AMOUNT = 2_000_000;
@@ -17,21 +18,13 @@ function isVariableRate(rate: MortgageRate) {
   return /SORA/i.test(rate.product_name);
 }
 
-function formatRate(rate: MortgageRate) {
-  if (isVariableRate(rate)) {
-    // Show the spread with a "+" prefix to signal it's added to SORA
-    return `SORA +${rate.interest_rate.toFixed(2)}%`;
-  }
-  return `${rate.interest_rate.toFixed(2)}%`;
-}
-
 export default async function MortgageTable() {
   const supabase = createServerClient();
 
-  const { data: rates, error } = await supabase
-    .from("mortgage_rates")
-    .select("*")
-    .order("interest_rate", { ascending: true });
+  const [{ data: rates, error }, sora] = await Promise.all([
+    supabase.from("mortgage_rates").select("*").order("interest_rate", { ascending: true }),
+    fetchSoraRate(),
+  ]);
 
   if (error) {
     return (
@@ -50,21 +43,19 @@ export default async function MortgageTable() {
   }
 
   const enriched = rates.map((rate) => {
-    const fixed = !isVariableRate(rate);
-    const monthly = fixed
-      ? calculateMonthlyPayment(LOAN_AMOUNT, rate.interest_rate, LOAN_TENURE)
-      : null;
-    return {
-      ...rate,
-      monthly,
-      total: monthly ? calculateTotalPayment(monthly, LOAN_TENURE) : null,
-    };
+    const variable = isVariableRate(rate);
+    const effectiveRate = variable ? sora.rate + rate.interest_rate : rate.interest_rate;
+    const monthly = calculateMonthlyPayment(LOAN_AMOUNT, effectiveRate, LOAN_TENURE);
+    const total = calculateTotalPayment(monthly, LOAN_TENURE);
+    return { ...rate, effectiveRate, monthly, total, variable };
   });
 
-  const fixedTotals = enriched
-    .map((r) => r.total)
-    .filter((t): t is number => t !== null);
-  const bestTotal = fixedTotals.length > 0 ? Math.min(...fixedTotals) : null;
+  const bestTotal = Math.min(...enriched.map((r) => r.total));
+
+  const soraDisplay = sora.rate.toFixed(2);
+  const soraLabel = sora.isLive
+    ? `3M SORA: ${soraDisplay}%${sora.date ? ` as at ${sora.date}` : ""}`
+    : `*3M SORA estimated at ${soraDisplay}% — live data temporarily unavailable`;
 
   return (
     <div className="border border-neutral-200 rounded-lg overflow-hidden">
@@ -90,17 +81,26 @@ export default async function MortgageTable() {
               <TableCell className="text-neutral-500 max-w-[180px] truncate" title={r.product_name}>
                 {r.product_name}
               </TableCell>
-              <TableCell className="text-neutral-900">{formatRate(r)}</TableCell>
+              <TableCell className="text-neutral-900">
+                {r.variable ? (
+                  <span>
+                    {r.effectiveRate.toFixed(2)}%{!sora.isLive && "*"}
+                    <span className="ml-1.5 text-xs text-neutral-400">
+                      (SORA +{r.interest_rate.toFixed(2)}%)
+                    </span>
+                  </span>
+                ) : (
+                  `${r.interest_rate.toFixed(2)}%`
+                )}
+              </TableCell>
               <TableCell className="text-neutral-500">
                 {r.lock_in_years > 0 ? `${r.lock_in_years}yr` : "—"}
               </TableCell>
               <TableCell className="text-neutral-900">
-                {r.monthly ? `$${r.monthly.toFixed(0)}` : "Variable"}
+                ${r.monthly.toFixed(0)}
               </TableCell>
               <TableCell>
-                {r.total === null ? (
-                  <span className="text-neutral-400">Variable</span>
-                ) : r.total === bestTotal ? (
+                {r.total === bestTotal ? (
                   <span className="font-semibold text-neutral-900">
                     ${r.total.toFixed(0)}
                     <span className="ml-2 text-xs font-normal bg-neutral-900 text-white px-1.5 py-0.5 rounded">
@@ -117,7 +117,7 @@ export default async function MortgageTable() {
       </Table>
 
       <p className="text-xs text-neutral-400 px-4 py-3 border-t border-neutral-100">
-        Based on S$2,000,000 loan over 25 years. SORA rates show the spread only — actual rate varies with market.
+        Based on S$2,000,000 loan over 25 years. {soraLabel}.
       </p>
     </div>
   );
