@@ -45,7 +45,20 @@ async function main() {
     return;
   }
 
-  const banks = [...new Set(rates.map((r) => r.bank))];
+  // Deduplicate by (bank, interest_rate, lock_in_years) — keeps first occurrence
+  const seen = new Set<string>();
+  const unique = rates.filter((r) => {
+    const key = `${r.bank}|${r.interest_rate}|${r.lock_in_years}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  if (unique.length < rates.length) {
+    console.log(`Deduped ${rates.length - unique.length} duplicate(s) — inserting ${unique.length} rate(s)`);
+  }
+
+  const banks = [...new Set(unique.map((r) => r.bank))];
 
   const { error: deleteError } = await supabase
     .from("mortgage_rates")
@@ -58,13 +71,13 @@ async function main() {
 
   const { error: insertError } = await supabase
     .from("mortgage_rates")
-    .insert(rates);
+    .insert(unique);
 
   if (insertError) {
     throw new Error(`Failed to insert rates: ${insertError.message}`);
   }
 
-  console.log(`Inserted ${rates.length} rate(s) for: ${banks.join(", ")}`);
+  console.log(`Inserted ${unique.length} rate(s) for: ${banks.join(", ")}`);
 }
 
 main().catch((err) => {

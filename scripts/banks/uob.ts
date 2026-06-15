@@ -1,8 +1,12 @@
-[
-{
-  bank: "UOB",
-  product_name: "2-Year Fixed",
-  interest_rate: 2.45,
-  lock_in_years: 2
+import type { MortgageRateInsert } from "../types";
+
+export async function scrapeUOB(): Promise<MortgageRateInsert[]> {
+  return [
+    {
+      bank: "UOB",
+      product_name: "2-Year Fixed",
+      interest_rate: 2.45,
+      lock_in_years: 2,
+    },
+  ];
 }
-]
