@@ -58,17 +58,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       </div>
 
       <div
-        className="mt-10 prose prose-neutral max-w-none
-          prose-headings:font-semibold prose-headings:text-neutral-900
-          prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-3
-          prose-h3:text-base prose-h3:mt-6 prose-h3:mb-2
-          prose-p:text-neutral-600 prose-p:leading-7
-          prose-li:text-neutral-600
-          prose-strong:text-neutral-900 prose-strong:font-medium
-          prose-a:text-neutral-900 prose-a:underline
-          prose-table:text-sm prose-th:text-left prose-th:font-medium prose-th:text-neutral-500
-          prose-td:text-neutral-600 prose-td:py-2 prose-th:py-2
-          [&_.lead]:text-lg [&_.lead]:text-neutral-700 [&_.lead]:leading-8"
+        className="mt-10 prose prose-neutral max-w-none article-body"
         dangerouslySetInnerHTML={{ __html: article.content ?? "" }}
       />
     </div>
