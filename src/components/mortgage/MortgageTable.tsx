@@ -7,12 +7,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { createServerClient } from "@/supabase/server";
-import { calculateMonthlyPayment, calculateTotalPayment } from "@/lib/mortgage";
+import { calculateMonthlyPayment, calculateTotalPayment, formatSGD } from "@/lib/mortgage";
 import { fetchSoraRate } from "@/lib/sora";
 import type { MortgageRate } from "@/supabase/types";
 
 const LOAN_AMOUNT = 2_000_000;
 const LOAN_TENURE = 25;
+
+const BANK_URLS: Record<string, string> = {
+  DBS: "https://www.dbs.com.sg/personal/rates-online/home-loans.page",
+  OCBC: "https://www.ocbc.com/personal-banking/loans/new-purchase-of-hdb-private-property.page",
+  UOB: "https://www.uob.com.sg/personal/borrow/property-loan.page",
+  "Standard Chartered": "https://www.sc.com/sg/borrow/mortgages/sora/",
+};
 
 function isVariableRate(rate: MortgageRate) {
   return /SORA/i.test(rate.product_name);
@@ -77,7 +84,20 @@ export default async function MortgageTable() {
               key={r.id}
               className="border-neutral-100 hover:bg-neutral-50 transition-colors"
             >
-              <TableCell className="font-medium text-neutral-900">{r.bank}</TableCell>
+              <TableCell className="font-medium text-neutral-900">
+                {BANK_URLS[r.bank] ? (
+                  <a
+                    href={BANK_URLS[r.bank]}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline"
+                  >
+                    {r.bank}
+                  </a>
+                ) : (
+                  r.bank
+                )}
+              </TableCell>
               <TableCell className="text-neutral-500 max-w-[180px] truncate" title={r.product_name}>
                 {r.product_name}
               </TableCell>
@@ -97,18 +117,18 @@ export default async function MortgageTable() {
                 {r.lock_in_years > 0 ? `${r.lock_in_years}yr` : "—"}
               </TableCell>
               <TableCell className="text-neutral-900">
-                ${r.monthly.toFixed(0)}
+                {formatSGD(r.monthly)}
               </TableCell>
               <TableCell>
                 {r.total === bestTotal ? (
                   <span className="font-semibold text-neutral-900">
-                    ${r.total.toFixed(0)}
+                    {formatSGD(r.total)}
                     <span className="ml-2 text-xs font-normal bg-neutral-900 text-white px-1.5 py-0.5 rounded">
                       Best
                     </span>
                   </span>
                 ) : (
-                  <span className="text-neutral-600">${r.total.toFixed(0)}</span>
+                  <span className="text-neutral-600">{formatSGD(r.total)}</span>
                 )}
               </TableCell>
             </TableRow>
