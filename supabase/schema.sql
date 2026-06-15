@@ -91,6 +91,16 @@ do $$ begin
   end if;
 end $$;
 
+-- subscribers
+create table if not exists public.subscribers (
+  id            uuid        primary key default gen_random_uuid(),
+  email         text        not null unique,
+  status        text        not null default 'active',
+  subscribed_at timestamptz not null default now()
+);
+
+alter table public.subscribers enable row level security;
+
 -- calculators
 create table if not exists public.calculators (
   id          uuid        primary key default gen_random_uuid(),

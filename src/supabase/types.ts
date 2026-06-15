@@ -88,6 +88,27 @@ export type Database = {
         };
         Relationships: [];
       };
+      subscribers: {
+        Row: {
+          id: string;
+          email: string;
+          status: string;
+          subscribed_at: string;
+        };
+        Insert: {
+          id?: string;
+          email: string;
+          status?: string;
+          subscribed_at?: string;
+        };
+        Update: {
+          id?: string;
+          email?: string;
+          status?: string;
+          subscribed_at?: string;
+        };
+        Relationships: [];
+      };
       calculators: {
         Row: {
           id: string;
