@@ -1,0 +1,14 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/import-ura",
+      "schedule": "0 18 10 * *"
+    }
+  ],
+  "functions": {
+    "app/api/cron/import-ura/route.ts": {
+      "maxDuration": 300,
+      "regions": ["sin1"]
+    }
+  }
+}

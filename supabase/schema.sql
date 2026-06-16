@@ -101,6 +101,53 @@ create table if not exists public.subscribers (
 
 alter table public.subscribers enable row level security;
 
+-- property_transactions (URA private residential)
+create table if not exists public.property_transactions (
+  id            uuid         primary key default gen_random_uuid(),
+  project       text         not null,
+  street        text,
+  district      smallint     not null,
+  price         integer      not null,
+  area_sqm      numeric(8,2) not null,
+  psf           numeric(10,2) generated always as (price / (area_sqm * 10.7639)) stored,
+  floor_range   text,
+  property_type text,
+  tenure        text,
+  type_of_sale  text,
+  contract_date date         not null,
+  imported_at   timestamptz  not null default now(),
+  unique (project, district, price, area_sqm, contract_date, floor_range)
+);
+
+alter table public.property_transactions enable row level security;
+
+do $$ begin
+  if not exists (
+    select 1 from pg_policies
+    where tablename = 'property_transactions' and policyname = 'Public read property_transactions'
+  ) then
+    create policy "Public read property_transactions"
+      on public.property_transactions for select to anon using (true);
+  end if;
+end $$;
+
+create index if not exists idx_prop_tx_district on public.property_transactions (district);
+create index if not exists idx_prop_tx_contract_date on public.property_transactions (contract_date desc);
+
+-- district_summary: median PSF and transaction count per district (last 3 months)
+create or replace view public.district_summary as
+select
+  district,
+  count(*)::integer                                                          as transaction_count,
+  round(percentile_cont(0.5) within group (order by psf)::numeric, 0)::integer as median_psf,
+  max(contract_date)                                                         as latest_date
+from public.property_transactions
+where contract_date >= current_date - interval '3 months'
+group by district
+order by district;
+
+grant select on public.district_summary to anon;
+
 -- calculators
 create table if not exists public.calculators (
   id          uuid        primary key default gen_random_uuid(),

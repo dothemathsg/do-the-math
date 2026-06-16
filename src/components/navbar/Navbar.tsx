@@ -6,6 +6,7 @@ import { Menu, X } from "lucide-react";
 
 const NAV_LINKS = [
   { href: "/mortgage-rates", label: "Rates" },
+  { href: "/property-prices", label: "Property" },
   { href: "/calculator", label: "Calculator" },
   { href: "/articles", label: "Learn" },
 ];

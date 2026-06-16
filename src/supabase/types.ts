@@ -88,6 +88,52 @@ export type Database = {
         };
         Relationships: [];
       };
+      property_transactions: {
+        Row: {
+          id: string;
+          project: string;
+          street: string | null;
+          district: number;
+          price: number;
+          area_sqm: number;
+          psf: number | null;
+          floor_range: string | null;
+          property_type: string | null;
+          tenure: string | null;
+          type_of_sale: string | null;
+          contract_date: string;
+          imported_at: string;
+        };
+        Insert: {
+          id?: string;
+          project: string;
+          street?: string | null;
+          district: number;
+          price: number;
+          area_sqm: number;
+          floor_range?: string | null;
+          property_type?: string | null;
+          tenure?: string | null;
+          type_of_sale?: string | null;
+          contract_date: string;
+          imported_at?: string;
+        };
+        Update: {
+          id?: string;
+          project?: string;
+          street?: string | null;
+          district?: number;
+          price?: number;
+          area_sqm?: number;
+          floor_range?: string | null;
+          property_type?: string | null;
+          tenure?: string | null;
+          type_of_sale?: string | null;
+          contract_date?: string;
+          imported_at?: string;
+        };
+        Relationships: [];
+      };
       subscribers: {
         Row: {
           id: string;
@@ -134,7 +180,17 @@ export type Database = {
         Relationships: [];
       };
     };
-    Views: {};
+    Views: {
+      district_summary: {
+        Row: {
+          district: number;
+          transaction_count: number;
+          median_psf: number | null;
+          latest_date: string | null;
+        };
+        Relationships: [];
+      };
+    };
     Functions: {};
     Enums: {};
     CompositeTypes: {};
