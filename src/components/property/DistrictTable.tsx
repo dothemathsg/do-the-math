@@ -76,9 +76,9 @@ export default function DistrictTable({
   }
 
   function SortIndicator({ col }: { col: SortKey }) {
-    if (sort.key !== col) return <span className="ml-1 opacity-30">↕</span>;
+    if (sort.key !== col) return <span className="mr-1 opacity-30">↕</span>;
     return (
-      <span className="ml-1 opacity-80">{sort.dir === "desc" ? "↓" : "↑"}</span>
+      <span className="mr-1 opacity-80">{sort.dir === "desc" ? "↓" : "↑"}</span>
     );
   }
 
@@ -98,8 +98,8 @@ export default function DistrictTable({
         } ${className}`}
         onClick={() => handleSort(col)}
       >
-        {children}
         <SortIndicator col={col} />
+        {children}
       </th>
     );
   }
@@ -114,15 +114,9 @@ export default function DistrictTable({
               <Th col="floor_range" className="hidden sm:table-cell">
                 Floor
               </Th>
-              <Th col="area_sqm" className="text-right">
-                <span className="block text-right">Area (sqft)</span>
-              </Th>
-              <Th col="price" className="text-right">
-                <span className="block text-right">Price</span>
-              </Th>
-              <Th col="psf" className="text-right">
-                <span className="block text-right">PSF</span>
-              </Th>
+              <Th col="area_sqm" className="text-right">Area (sqft)</Th>
+              <Th col="price" className="text-right">Price</Th>
+              <Th col="psf" className="text-right">PSF</Th>
               <Th col="property_type">Type</Th>
               <Th col="contract_date">Date</Th>
             </tr>
