@@ -3,10 +3,16 @@ import MortgageTable from "@/components/mortgage/MortgageTable";
 
 export const revalidate = 3600; // re-fetch from Supabase at most once per hour
 
+function monthHeading() {
+  return new Date().toLocaleDateString("en-SG", { month: "long", year: "numeric" });
+}
+
 export default function MortgageRatesPage() {
   return (
     <div className="py-10 space-y-6">
-      <h1 className="text-3xl font-semibold">Mortgage Rates</h1>
+      <h1 className="text-3xl font-semibold">
+        Mortgage Rates in {monthHeading()}
+      </h1>
 
       <p className="text-zinc-600">
         Compare the latest home loan packages in Singapore.
