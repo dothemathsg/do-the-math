@@ -76,9 +76,9 @@ export default function DistrictTable({
   }
 
   function SortIndicator({ col }: { col: SortKey }) {
-    if (sort.key !== col) return <span className="mr-1 opacity-30">↕</span>;
+    if (sort.key !== col) return <span className="ml-1 opacity-30">↕</span>;
     return (
-      <span className="mr-1 opacity-80">{sort.dir === "desc" ? "↓" : "↑"}</span>
+      <span className="ml-1 opacity-80">{sort.dir === "desc" ? "↓" : "↑"}</span>
     );
   }
 
@@ -98,8 +98,8 @@ export default function DistrictTable({
         } ${className}`}
         onClick={() => handleSort(col)}
       >
-        <SortIndicator col={col} />
         {children}
+        <SortIndicator col={col} />
       </th>
     );
   }
