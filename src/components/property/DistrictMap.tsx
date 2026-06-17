@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import MapGL, { Source, Layer, type MapRef } from "react-map-gl/maplibre";
 import type { MapLayerMouseEvent } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -10,23 +10,28 @@ import { scaleSequential } from "d3-scale";
 import { interpolateYlOrRd } from "d3-scale-chromatic";
 import type { DistrictSummary } from "@/lib/propertyPrices";
 import type { FeatureCollection, Geometry } from "geojson";
+import type { PropertyFilter } from "./PropertyPricesClient";
 
 const MAP_STYLE = "https://tiles.openfreemap.org/styles/positron";
 const SG_GEOJSON_URL = "/sg-districts.geojson";
 
-const MIN_PSF = 700;
-const MAX_PSF = 3000;
-const colorScale = scaleSequential(interpolateYlOrRd).domain([MIN_PSF, MAX_PSF]);
-
-function buildColorExpression(data: DistrictSummary[]) {
+function buildColorExpression(
+  data: DistrictSummary[],
+  colorScale: (v: number) => string
+) {
   const stops: (string | number)[] = [];
   for (const d of data) {
     if (d.median_psf == null) continue;
-    const clamped = Math.min(d.median_psf, MAX_PSF);
-    stops.push(d.district, colorScale(clamped));
+    stops.push(d.district, colorScale(d.median_psf));
   }
   if (stops.length === 0) return "#d1d5db";
   return ["match", ["get", "district"], ...stops, "#d1d5db"] as unknown as string;
+}
+
+function districtPath(district: number, filter: PropertyFilter): string {
+  return filter !== "all"
+    ? `/property-prices/district/${district}?type=${filter}`
+    : `/property-prices/district/${district}`;
 }
 
 interface TooltipState {
@@ -36,6 +41,7 @@ interface TooltipState {
   name: string;
   psf: number | null;
   count: number;
+  path: string;
 }
 
 interface BlurbState {
@@ -43,6 +49,7 @@ interface BlurbState {
   name: string;
   psf: number | null;
   count: number;
+  path: string;
 }
 
 interface DistrictProperties {
@@ -52,10 +59,10 @@ interface DistrictProperties {
 
 export default function DistrictMap({
   data,
-  activeDistricts = null,
+  activeFilter = "all",
 }: {
   data: DistrictSummary[];
-  activeDistricts?: Set<number> | null;
+  activeFilter?: PropertyFilter;
 }) {
   const router = useRouter();
   const mapRef = useRef<MapRef>(null);
@@ -65,7 +72,23 @@ export default function DistrictMap({
   const [blurb, setBlurb] = useState<BlurbState | null>(null);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
 
-  const byDistrict = new Map(data.map((d) => [d.district, d]));
+  const byDistrict = useMemo(
+    () => new Map(data.map((d) => [d.district, d])),
+    [data]
+  );
+
+  // Dynamic color scale: fits the range of the current data
+  const { colorScale, minPSF, maxPSF } = useMemo(() => {
+    const psfs = data.map((d) => d.median_psf).filter((p): p is number => p != null);
+    if (psfs.length === 0) {
+      const scale = scaleSequential(interpolateYlOrRd).domain([700, 3000]);
+      return { colorScale: scale, minPSF: 700, maxPSF: 3000 };
+    }
+    const lo = Math.min(...psfs);
+    const hi = Math.max(...psfs);
+    const scale = scaleSequential(interpolateYlOrRd).domain([lo, hi]);
+    return { colorScale: scale, minPSF: lo, maxPSF: hi };
+  }, [data]);
 
   useEffect(() => {
     setIsTouchDevice(window.matchMedia("(hover: none)").matches);
@@ -96,9 +119,10 @@ export default function DistrictMap({
         name: props.name,
         psf: d?.median_psf ?? null,
         count: d?.transaction_count ?? 0,
+        path: districtPath(props.district, activeFilter),
       });
     },
-    [byDistrict]
+    [byDistrict, activeFilter]
   );
 
   const handleMouseLeave = useCallback(() => {
@@ -115,6 +139,8 @@ export default function DistrictMap({
         return;
       }
       const props = features[0].properties as DistrictProperties;
+      const path = districtPath(props.district, activeFilter);
+
       if (isTouchDevice) {
         const d = byDistrict.get(props.district);
         setHoveredDistrict(props.district);
@@ -123,27 +149,16 @@ export default function DistrictMap({
           name: props.name,
           psf: d?.median_psf ?? null,
           count: d?.transaction_count ?? 0,
+          path,
         });
       } else {
-        router.push(`/property-prices/district/${props.district}`);
+        router.push(path);
       }
     },
-    [isTouchDevice, byDistrict, router]
+    [isTouchDevice, byDistrict, router, activeFilter]
   );
 
-  const fillColorExpression = buildColorExpression(data);
-
-  const fillOpacityExpression =
-    activeDistricts === null
-      ? (["case", ["==", ["get", "district"], hoveredDistrict ?? -1], 0.85, 0.65] as unknown as number)
-      : ([
-          "case",
-          ["==", ["get", "district"], hoveredDistrict ?? -1],
-          0.9,
-          ["in", ["get", "district"], ["literal", [...activeDistricts]]],
-          0.72,
-          0.08,
-        ] as unknown as number);
+  const fillColorExpression = buildColorExpression(data, colorScale);
 
   return (
     <div className="space-y-2">
@@ -168,7 +183,12 @@ export default function DistrictMap({
                 type="fill"
                 paint={{
                   "fill-color": fillColorExpression as unknown as string,
-                  "fill-opacity": fillOpacityExpression,
+                  "fill-opacity": [
+                    "case",
+                    ["==", ["get", "district"], hoveredDistrict ?? -1],
+                    0.85,
+                    0.65,
+                  ],
                 }}
               />
               <Layer
@@ -210,12 +230,12 @@ export default function DistrictMap({
                 </p>
               </>
             ) : (
-              <p className="text-neutral-400 text-xs mt-0.5">No recent data</p>
+              <p className="text-neutral-400 text-xs mt-0.5">No data for selected type</p>
             )}
           </div>
         )}
 
-        {/* Mobile tap blurb — bottom panel */}
+        {/* Mobile tap blurb */}
         {blurb && isTouchDevice && (
           <div className="absolute bottom-0 left-0 right-0 z-10 bg-white border-t border-neutral-200 px-4 py-3">
             <div className="flex items-start justify-between gap-3">
@@ -234,7 +254,7 @@ export default function DistrictMap({
                     </p>
                   </>
                 ) : (
-                  <p className="text-sm text-neutral-400 mt-0.5">No recent data</p>
+                  <p className="text-sm text-neutral-400 mt-0.5">No data for selected type</p>
                 )}
               </div>
               <button
@@ -246,7 +266,7 @@ export default function DistrictMap({
               </button>
             </div>
             <Link
-              href={`/property-prices/district/${blurb.district}`}
+              href={blurb.path}
               className="mt-2.5 inline-flex items-center gap-1 text-sm font-medium text-neutral-900 underline underline-offset-2"
             >
               View projects →
@@ -254,7 +274,6 @@ export default function DistrictMap({
           </div>
         )}
 
-        {/* Loading overlay */}
         {!geojson && (
           <div className="absolute inset-0 flex items-center justify-center bg-white/60 pointer-events-none">
             <span className="text-sm text-neutral-400">Loading map…</span>
@@ -262,16 +281,16 @@ export default function DistrictMap({
         )}
       </div>
 
-      {/* Legend */}
+      {/* Legend — shows actual PSF range of current data */}
       <div className="flex items-center gap-3 text-xs text-neutral-500">
-        <span>Lower PSF</span>
+        <span>${minPSF.toLocaleString()}</span>
         <div
           className="flex-1 h-3 rounded"
           style={{
-            background: `linear-gradient(to right, ${colorScale(MIN_PSF)}, ${colorScale((MIN_PSF + MAX_PSF) / 2)}, ${colorScale(MAX_PSF)})`,
+            background: `linear-gradient(to right, ${colorScale(minPSF)}, ${colorScale((minPSF + maxPSF) / 2)}, ${colorScale(maxPSF)})`,
           }}
         />
-        <span>Higher PSF</span>
+        <span>${maxPSF.toLocaleString()} psf</span>
         <div className="flex items-center gap-1 ml-2">
           <div className="w-3 h-3 rounded bg-[#d1d5db]" />
           <span>No data</span>

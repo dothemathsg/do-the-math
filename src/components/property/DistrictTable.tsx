@@ -14,6 +14,14 @@ type SortKey =
   | "contract_date";
 
 type SortDir = "asc" | "desc";
+type PropertyFilter = "all" | "hdb" | "condo" | "landed";
+
+const FILTER_OPTIONS: Array<{ id: PropertyFilter; label: string }> = [
+  { id: "all",    label: "All" },
+  { id: "hdb",    label: "HDB" },
+  { id: "condo",  label: "Condo" },
+  { id: "landed", label: "Landed" },
+];
 
 const PAGE_SIZE = 50;
 
@@ -34,19 +42,48 @@ function formatDate(iso: string) {
   });
 }
 
+function matchesFilter(tx: PropertyTransaction, filter: PropertyFilter): boolean {
+  if (filter === "all") return true;
+  const pt = (tx.property_type ?? "").toLowerCase();
+  if (filter === "hdb") return pt.startsWith("hdb");
+  if (filter === "condo") return ["condominium", "apartment", "executive condominium", "strata terrace"].some((t) => pt === t);
+  if (filter === "landed") return ["semi-detached", "terrace", "detached"].some((t) => pt === t);
+  return true;
+}
+
 export default function DistrictTable({
   transactions,
+  initialFilter = "all",
 }: {
   transactions: PropertyTransaction[];
+  initialFilter?: string;
 }) {
   const [sort, setSort] = useState<{ key: SortKey; dir: SortDir }>({
     key: "contract_date",
     dir: "desc",
   });
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<PropertyFilter>(
+    FILTER_OPTIONS.some((o) => o.id === initialFilter)
+      ? (initialFilter as PropertyFilter)
+      : "all"
+  );
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return transactions.filter((tx) => {
+      if (!matchesFilter(tx, filter)) return false;
+      if (!q) return true;
+      return (
+        (tx.project ?? "").toLowerCase().includes(q) ||
+        (tx.street ?? "").toLowerCase().includes(q)
+      );
+    });
+  }, [transactions, filter, search]);
 
   const sorted = useMemo(() => {
-    return [...transactions].sort((a, b) => {
+    return [...filtered].sort((a, b) => {
       const { key, dir } = sort;
       let cmp = 0;
 
@@ -62,7 +99,7 @@ export default function DistrictTable({
 
       return dir === "asc" ? cmp : -cmp;
     });
-  }, [transactions, sort]);
+  }, [filtered, sort]);
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
   const paged = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -72,6 +109,16 @@ export default function DistrictTable({
       key,
       dir: prev.key === key && prev.dir === "desc" ? "asc" : "desc",
     }));
+    setPage(1);
+  }
+
+  function handleSearch(value: string) {
+    setSearch(value);
+    setPage(1);
+  }
+
+  function handleFilter(f: PropertyFilter) {
+    setFilter(f);
     setPage(1);
   }
 
@@ -106,6 +153,32 @@ export default function DistrictTable({
 
   return (
     <div className="space-y-3">
+      {/* Search + filter */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => handleSearch(e.target.value)}
+          placeholder="Search project or street…"
+          className="flex-1 px-3 py-2 text-sm rounded-lg border border-neutral-200 bg-white placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-neutral-400"
+        />
+        <div className="flex gap-1.5">
+          {FILTER_OPTIONS.map((opt) => (
+            <button
+              key={opt.id}
+              onClick={() => handleFilter(opt.id)}
+              className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
+                filter === opt.id
+                  ? "bg-neutral-900 text-white border-neutral-900"
+                  : "bg-white text-neutral-600 border-neutral-200 hover:border-neutral-400"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="overflow-x-auto rounded-xl border border-neutral-200">
         <table className="w-full text-sm">
           <thead>
@@ -122,37 +195,45 @@ export default function DistrictTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-100">
-            {paged.map((tx) => (
-              <tr key={tx.id} className="hover:bg-neutral-50">
-                <td className="px-4 py-3">
-                  <p className="font-medium text-neutral-900">{tx.project}</p>
-                  {tx.street && (
-                    <p className="text-xs text-neutral-400">{tx.street}</p>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-neutral-600 hidden sm:table-cell">
-                  {tx.floor_range ?? "—"}
-                </td>
-                <td className="px-4 py-3 text-neutral-600 text-right">
-                  {tx.area_sqm
-                    ? Math.round(tx.area_sqm * 10.7639).toLocaleString()
-                    : "—"}
-                </td>
-                <td className="px-4 py-3 font-medium text-neutral-900 text-right">
-                  {formatSGD(tx.price)}
-                </td>
-                <td className="px-4 py-3 text-neutral-700 text-right">
-                  {tx.psf ? formatSGD(Math.round(tx.psf)) : "—"}
-                </td>
-                <td className="px-4 py-3 text-neutral-500 text-xs">
-                  <p>{tx.property_type ?? "—"}</p>
-                  <p>{tx.type_of_sale ?? ""}</p>
-                </td>
-                <td className="px-4 py-3 text-neutral-500">
-                  {formatDate(tx.contract_date)}
+            {paged.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="px-4 py-8 text-center text-sm text-neutral-400">
+                  No transactions match your search.
                 </td>
               </tr>
-            ))}
+            ) : (
+              paged.map((tx) => (
+                <tr key={tx.id} className="hover:bg-neutral-50">
+                  <td className="px-4 py-3">
+                    <p className="font-medium text-neutral-900">{tx.project}</p>
+                    {tx.street && (
+                      <p className="text-xs text-neutral-400">{tx.street}</p>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-neutral-600 hidden sm:table-cell">
+                    {tx.floor_range ?? "—"}
+                  </td>
+                  <td className="px-4 py-3 text-neutral-600 text-right">
+                    {tx.area_sqm
+                      ? Math.round(tx.area_sqm * 10.7639).toLocaleString()
+                      : "—"}
+                  </td>
+                  <td className="px-4 py-3 font-medium text-neutral-900 text-right">
+                    {formatSGD(tx.price)}
+                  </td>
+                  <td className="px-4 py-3 text-neutral-700 text-right">
+                    {tx.psf ? formatSGD(Math.round(tx.psf)) : "—"}
+                  </td>
+                  <td className="px-4 py-3 text-neutral-500 text-xs">
+                    <p>{tx.property_type ?? "—"}</p>
+                    <p>{tx.type_of_sale ?? ""}</p>
+                  </td>
+                  <td className="px-4 py-3 text-neutral-500">
+                    {formatDate(tx.contract_date)}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

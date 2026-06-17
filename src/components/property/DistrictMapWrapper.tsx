@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import type { DistrictSummary } from "@/lib/propertyPrices";
+import type { PropertyFilter } from "./PropertyPricesClient";
 
 const DistrictMap = dynamic(() => import("./DistrictMap"), {
   ssr: false,
@@ -12,10 +13,10 @@ const DistrictMap = dynamic(() => import("./DistrictMap"), {
 
 export default function DistrictMapWrapper({
   data,
-  activeDistricts,
+  activeFilter = "all",
 }: {
   data: DistrictSummary[];
-  activeDistricts?: Set<number> | null;
+  activeFilter?: PropertyFilter;
 }) {
-  return <DistrictMap data={data} activeDistricts={activeDistricts} />;
+  return <DistrictMap data={data} activeFilter={activeFilter} />;
 }

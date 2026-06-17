@@ -8,8 +8,11 @@ import type { Metadata } from "next";
 
 export const revalidate = 3600;
 
+const VALID_FILTERS = new Set(["hdb", "condo", "landed"]);
+
 interface Props {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ type?: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -22,8 +25,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function DistrictPage({ params }: Props) {
+export default async function DistrictPage({ params, searchParams }: Props) {
   const { id } = await params;
+  const { type } = await searchParams;
   const district = parseInt(id);
 
   if (!district || district < 1 || district > 28) notFound();
@@ -31,6 +35,7 @@ export default async function DistrictPage({ params }: Props) {
   const name = DISTRICT_NAMES[district];
   if (!name) notFound();
 
+  const initialFilter = type && VALID_FILTERS.has(type) ? type : "all";
   const transactions = await getDistrictTransactions(district);
 
   return (
@@ -54,7 +59,7 @@ export default async function DistrictPage({ params }: Props) {
       </div>
 
       {transactions.length > 0 ? (
-        <DistrictTable transactions={transactions} />
+        <DistrictTable transactions={transactions} initialFilter={initialFilter} />
       ) : (
         <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-8 text-center text-sm text-neutral-500">
           Transaction data for this district will appear once the next data import
