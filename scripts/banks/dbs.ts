@@ -48,8 +48,18 @@ export async function scrapeDBS(): Promise<MortgageRateInsert[]> {
         {
           type: "json",
           schema: extractSchema,
-          prompt:
-            "Extract all home loan packages. For each package include: product_name (e.g. '2-Year Fixed Rate'), interest_rate as a decimal number (e.g. 3.68), lock_in_years as an integer, and any notes (promotional conditions, cashback, etc.).",
+          prompt: [
+            "Extract all home loan packages from the main rate table only.",
+            "Ignore all disclaimer text, footnotes, and any rates mentioned inside asterisk/star notes.",
+            "For each package provide:",
+            "- product_name: descriptive name including lock-in period and rate type.",
+            "  Always include 'SORA' in the name for SORA-linked packages (e.g. 'Two-In-One 3M SORA 2-Year').",
+            "- interest_rate:",
+            "  * SORA-linked packages (formula shown as '3M SORA + X%'): set interest_rate to the spread X only (e.g. 0.75). Do NOT use any historical SORA value from disclaimers.",
+            "  * Fixed-rate packages: set interest_rate to the stated fixed rate (e.g. 3.68).",
+            "- lock_in_years: integer number of years in the lock-in period.",
+            "- notes: promotional conditions or cashback offers from the main table.",
+          ].join(" "),
         },
       ],
     }
