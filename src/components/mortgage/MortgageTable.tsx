@@ -17,8 +17,13 @@ const LOAN_TENURE = 25;
 const BANK_URLS: Record<string, string> = {
   DBS: "https://www.dbs.com.sg/personal/rates-online/home-loans.page",
   OCBC: "https://www.ocbc.com/personal-banking/loans/new-purchase-of-hdb-private-property.page",
-  UOB: "https://www.uob.com.sg/personal/borrow/property-loan.page",
+  UOB: "https://www.uob.com.sg/personal/borrow/property-loans/private-home-loan.page",
   "Standard Chartered": "https://www.sc.com/sg/borrow/mortgages/sora/",
+  CIMB: "https://www.cimb.com.sg/en/personal/banking-with-us/loans-financing/property-loan/cimb-private-property-loan.html",
+  Maybank: "https://www.maybank.com.sg/en/personal-banking/loans/home-loans.page",
+  Citibank: "https://www1.citibank.com.sg/loans/mortgage",
+  HSBC: "https://www.hsbc.com.sg/mortgages/",
+  "Bank of China": "https://www.bankofchina.com/sg/bocinfo/bi3/",
 };
 
 function isVariableRate(rate: MortgageRate) {
@@ -98,7 +103,7 @@ export default async function MortgageTable() {
                   r.bank
                 )}
               </TableCell>
-              <TableCell className="text-neutral-500 max-w-[180px] truncate" title={r.product_name}>
+              <TableCell className="text-neutral-500" title={r.product_name}>
                 {r.product_name}
               </TableCell>
               <TableCell className="text-neutral-900">

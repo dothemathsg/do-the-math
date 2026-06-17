@@ -7,6 +7,10 @@ import { scrapeOCBC } from "./banks/ocbc";
 import { scrapeUOB } from "./banks/uob";
 import { scrapeStandardChartered } from "./banks/sc";
 import { scrapeHSBC } from "./banks/hsbc";
+import { scrapeCIMB } from "./banks/cimb";
+import { scrapeMaybank } from "./banks/maybank";
+import { scrapeCitibank } from "./banks/citibank";
+import { scrapeBOC } from "./banks/boc";
 import type { MortgageRateInsert } from "./types";
 
 function createSupabaseClient() {
@@ -21,11 +25,15 @@ async function main() {
   const supabase = createSupabaseClient();
 
   const scrapers: Array<{ name: string; fn: () => Promise<MortgageRateInsert[]> }> = [
-    { name: "DBS", fn: scrapeDBS },
-    { name: "OCBC", fn: scrapeOCBC },
-    { name: "UOB", fn: scrapeUOB },
+    { name: "DBS",              fn: scrapeDBS },
+    { name: "OCBC",             fn: scrapeOCBC },
+    { name: "UOB",              fn: scrapeUOB },
     { name: "Standard Chartered", fn: scrapeStandardChartered },
-    { name: "HSBC", fn: scrapeHSBC },
+    { name: "HSBC",             fn: scrapeHSBC },
+    { name: "CIMB",             fn: scrapeCIMB },
+    { name: "Maybank",          fn: scrapeMaybank },
+    { name: "Citibank",         fn: scrapeCitibank },
+    { name: "Bank of China",    fn: scrapeBOC },
   ];
 
   const rates: MortgageRateInsert[] = [];
@@ -65,17 +73,13 @@ async function main() {
     .delete()
     .in("bank", banks);
 
-  if (deleteError) {
-    throw new Error(`Failed to clear existing rates: ${deleteError.message}`);
-  }
+  if (deleteError) throw new Error(`Failed to clear existing rates: ${deleteError.message}`);
 
   const { error: insertError } = await supabase
     .from("mortgage_rates")
     .insert(unique);
 
-  if (insertError) {
-    throw new Error(`Failed to insert rates: ${insertError.message}`);
-  }
+  if (insertError) throw new Error(`Failed to insert rates: ${insertError.message}`);
 
   console.log(`Inserted ${unique.length} rate(s) for: ${banks.join(", ")}`);
 }

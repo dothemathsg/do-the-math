@@ -44,10 +44,14 @@ export async function scrapeOCBC(): Promise<MortgageRateInsert[]> {
       if (spread < MIN_SPREAD || spread > MAX_SPREAD) continue;
 
       const spreadStr = spread.toFixed(2);
+      // Shorten "1M COMPOUNDED SORA" → "1M SORA" so product names fit in the table
+      const soraShort = soraType.replace(/(\d+[MW]?)\s+COMPOUNDED\s+/i, "$1 ");
+      // Shorten "Year 1" → "Yr 1", keep "Thereafter" as-is
+      const yearDisplay = yearLabel.replace(/^Year\s+/i, "Yr ");
 
       rates.push({
         bank: "OCBC",
-        product_name: `${soraType} + ${spreadStr}% (${yearLabel})`,
+        product_name: `${soraShort} + ${spreadStr}% (${yearDisplay})`,
         interest_rate: spread,
         lock_in_years: yearNum ?? 0,
         notes: `Variable rate linked to ${soraType}. Spread: +${spreadStr}%.`,

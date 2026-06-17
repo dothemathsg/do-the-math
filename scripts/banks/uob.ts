@@ -1,12 +1,9 @@
+import { firecrawlScrape } from "./firecrawlScraper";
 import type { MortgageRateInsert } from "../types";
 
 export async function scrapeUOB(): Promise<MortgageRateInsert[]> {
-  return [
-    {
-      bank: "UOB",
-      product_name: "2-Year Fixed",
-      interest_rate: 2.45,
-      lock_in_years: 2,
-    },
-  ];
+  return firecrawlScrape(
+    "UOB",
+    "https://www.uob.com.sg/personal/borrow/property-loans/private-home-loan.page"
+  );
 }
