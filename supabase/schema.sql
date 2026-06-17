@@ -11,9 +11,12 @@ create table if not exists public.mortgage_rates (
   interest_rate numeric(6,3) not null,
   lock_in_years integer      not null default 0,
   notes         text,
-  created_at    timestamptz  not null default now(),
-  updated_at    timestamptz  not null default now()
+  created_at    timestamptz  not null default now()
 );
+
+-- Add updated_at if it was not present at initial table creation
+alter table public.mortgage_rates
+  add column if not exists updated_at timestamptz not null default now();
 
 alter table public.mortgage_rates enable row level security;
 
