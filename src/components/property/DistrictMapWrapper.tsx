@@ -10,6 +10,12 @@ const DistrictMap = dynamic(() => import("./DistrictMap"), {
   ),
 });
 
-export default function DistrictMapWrapper({ data }: { data: DistrictSummary[] }) {
-  return <DistrictMap data={data} />;
+export default function DistrictMapWrapper({
+  data,
+  activeDistricts,
+}: {
+  data: DistrictSummary[];
+  activeDistricts?: Set<number> | null;
+}) {
+  return <DistrictMap data={data} activeDistricts={activeDistricts} />;
 }

@@ -50,7 +50,13 @@ interface DistrictProperties {
   name: string;
 }
 
-export default function DistrictMap({ data }: { data: DistrictSummary[] }) {
+export default function DistrictMap({
+  data,
+  activeDistricts = null,
+}: {
+  data: DistrictSummary[];
+  activeDistricts?: Set<number> | null;
+}) {
   const router = useRouter();
   const mapRef = useRef<MapRef>(null);
   const [geojson, setGeojson] = useState<FeatureCollection<Geometry, DistrictProperties> | null>(null);
@@ -127,6 +133,18 @@ export default function DistrictMap({ data }: { data: DistrictSummary[] }) {
 
   const fillColorExpression = buildColorExpression(data);
 
+  const fillOpacityExpression =
+    activeDistricts === null
+      ? (["case", ["==", ["get", "district"], hoveredDistrict ?? -1], 0.85, 0.65] as unknown as number)
+      : ([
+          "case",
+          ["==", ["get", "district"], hoveredDistrict ?? -1],
+          0.9,
+          ["in", ["get", "district"], ["literal", [...activeDistricts]]],
+          0.72,
+          0.08,
+        ] as unknown as number);
+
   return (
     <div className="space-y-2">
       <div className="relative rounded-xl overflow-hidden" style={{ height: 520 }}>
@@ -150,12 +168,7 @@ export default function DistrictMap({ data }: { data: DistrictSummary[] }) {
                 type="fill"
                 paint={{
                   "fill-color": fillColorExpression as unknown as string,
-                  "fill-opacity": [
-                    "case",
-                    ["==", ["get", "district"], hoveredDistrict ?? -1],
-                    0.85,
-                    0.65,
-                  ],
+                  "fill-opacity": fillOpacityExpression,
                 }}
               />
               <Layer
