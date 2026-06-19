@@ -1,0 +1,21 @@
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+export function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  if (pathname === "/admin/login") return NextResponse.next();
+
+  const token = request.cookies.get("admin_token")?.value;
+  const secret = process.env.ADMIN_SECRET;
+
+  if (!secret || token !== secret) {
+    const loginUrl = new URL("/admin/login", request.url);
+    loginUrl.searchParams.set("next", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  return NextResponse.next();
+}
+
+export const config = { matcher: ["/admin/:path*"] };

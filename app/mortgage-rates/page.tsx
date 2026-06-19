@@ -1,7 +1,21 @@
 import { Suspense } from "react";
 import MortgageTable from "@/components/mortgage/MortgageTable";
+import type { Metadata } from "next";
 
-export const revalidate = 3600; // re-fetch from Supabase at most once per hour
+export const revalidate = 3600;
+
+export const metadata: Metadata = {
+  title: "Singapore Mortgage Rates — DBS, OCBC, UOB, Standard Chartered",
+  description:
+    "Compare the latest SORA-linked and fixed home loan rates from Singapore's major banks. Updated regularly so you always see current pricing.",
+  alternates: { canonical: "https://www.dothemath.sg/mortgage-rates" },
+  openGraph: {
+    title: "Singapore Mortgage Rates — DBS, OCBC, UOB, Standard Chartered",
+    description:
+      "Compare the latest SORA-linked and fixed home loan rates from Singapore's major banks. Updated regularly so you always see current pricing.",
+    url: "https://www.dothemath.sg/mortgage-rates",
+  },
+};
 
 function monthHeading() {
   return new Date().toLocaleDateString("en-SG", { month: "long", year: "numeric" });
