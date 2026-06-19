@@ -57,6 +57,9 @@ export default function CarInsurancePage() {
       </Link>
 
       <h1 className="mt-6 text-3xl font-semibold text-neutral-900">Car Insurance in Singapore</h1>
+      <Link href="/insurance/car/rates" className="inline-flex items-center gap-1.5 mt-3 text-sm text-neutral-500 hover:text-neutral-900 transition-colors">
+        Compare car insurance rates →
+      </Link>
       <p className="mt-4 text-neutral-600 leading-relaxed">
         Car insurance is mandatory for all registered vehicles in Singapore — you must
         have at minimum third-party cover to drive legally. In practice, most car owners

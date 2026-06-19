@@ -10,24 +10,37 @@ const PROPERTY_LINKS = [
   { href: "/calculator", label: "Stamp Duty Calculator", desc: "BSD & ABSD calculator" },
 ];
 
-const TOP_LINKS = [
-  { href: "/insurance", label: "Insurance" },
-  { href: "/articles", label: "Learn" },
+const INSURANCE_LINKS = [
+  { href: "/insurance/car",       label: "Car Insurance",       desc: "Comprehensive plans & rates" },
+  { href: "/insurance/life",      label: "Life Insurance",      desc: "Term life plans & rates" },
+  { href: "/insurance/home",      label: "Home Insurance",      desc: "HDB & condo cover & rates" },
+  { href: "/insurance/travel",    label: "Travel Insurance",    desc: "Single trip & annual plans" },
+  { href: "/insurance/corporate", label: "Corporate Insurance", desc: "WICA, group health & more" },
 ];
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [propertyOpen, setPropertyOpen] = useState(false);
+  const [insuranceOpen, setInsuranceOpen] = useState(false);
   const [mobilePropertyOpen, setMobilePropertyOpen] = useState(false);
-  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [mobileInsuranceOpen, setMobileInsuranceOpen] = useState(false);
 
-  function openDropdown() {
-    if (closeTimer.current) clearTimeout(closeTimer.current);
+  const propertyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const insuranceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function openProperty() {
+    if (propertyTimer.current) clearTimeout(propertyTimer.current);
     setPropertyOpen(true);
   }
-
-  function closeDropdown() {
-    closeTimer.current = setTimeout(() => setPropertyOpen(false), 100);
+  function closeProperty() {
+    propertyTimer.current = setTimeout(() => setPropertyOpen(false), 100);
+  }
+  function openInsurance() {
+    if (insuranceTimer.current) clearTimeout(insuranceTimer.current);
+    setInsuranceOpen(true);
+  }
+  function closeInsurance() {
+    insuranceTimer.current = setTimeout(() => setInsuranceOpen(false), 100);
   }
 
   return (
@@ -46,35 +59,23 @@ export default function Navbar() {
         <nav className="hidden md:flex items-center gap-6 text-sm text-neutral-500">
 
           {/* Property dropdown */}
-          <div
-            className="relative"
-            onMouseEnter={openDropdown}
-            onMouseLeave={closeDropdown}
-          >
+          <div className="relative" onMouseEnter={openProperty} onMouseLeave={closeProperty}>
             <button
               className="flex items-center gap-1 hover:text-neutral-900 transition-colors"
               onClick={() => setPropertyOpen((o) => !o)}
             >
               Property
-              <ChevronDown
-                size={14}
-                className={`transition-transform duration-150 ${propertyOpen ? "rotate-180" : ""}`}
-              />
+              <ChevronDown size={14} className={`transition-transform duration-150 ${propertyOpen ? "rotate-180" : ""}`} />
             </button>
-
             {propertyOpen && (
               <div
                 className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 bg-white border border-neutral-200 rounded-xl shadow-lg py-2 z-50"
-                onMouseEnter={openDropdown}
-                onMouseLeave={closeDropdown}
+                onMouseEnter={openProperty}
+                onMouseLeave={closeProperty}
               >
                 {PROPERTY_LINKS.map((l) => (
-                  <Link
-                    key={l.href}
-                    href={l.href}
-                    onClick={() => setPropertyOpen(false)}
-                    className="block px-4 py-2.5 hover:bg-neutral-50 transition-colors"
-                  >
+                  <Link key={l.href} href={l.href} onClick={() => setPropertyOpen(false)}
+                    className="block px-4 py-2.5 hover:bg-neutral-50 transition-colors">
                     <p className="text-sm font-medium text-neutral-900">{l.label}</p>
                     <p className="text-xs text-neutral-400 mt-0.5">{l.desc}</p>
                   </Link>
@@ -83,11 +84,38 @@ export default function Navbar() {
             )}
           </div>
 
-          {TOP_LINKS.map((l) => (
-            <Link key={l.href} href={l.href} className="hover:text-neutral-900 transition-colors">
-              {l.label}
-            </Link>
-          ))}
+          {/* Insurance dropdown */}
+          <div className="relative" onMouseEnter={openInsurance} onMouseLeave={closeInsurance}>
+            <button
+              className="flex items-center gap-1 hover:text-neutral-900 transition-colors"
+              onClick={() => setInsuranceOpen((o) => !o)}
+            >
+              Insurance
+              <ChevronDown size={14} className={`transition-transform duration-150 ${insuranceOpen ? "rotate-180" : ""}`} />
+            </button>
+            {insuranceOpen && (
+              <div
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 bg-white border border-neutral-200 rounded-xl shadow-lg py-2 z-50"
+                onMouseEnter={openInsurance}
+                onMouseLeave={closeInsurance}
+              >
+                {INSURANCE_LINKS.map((l) => (
+                  <Link key={l.href} href={l.href} onClick={() => setInsuranceOpen(false)}
+                    className="block px-4 py-2.5 hover:bg-neutral-50 transition-colors">
+                    <p className="text-sm font-medium text-neutral-900">{l.label}</p>
+                    <p className="text-xs text-neutral-400 mt-0.5">{l.desc}</p>
+                  </Link>
+                ))}
+                <div className="mx-4 my-1 border-t border-neutral-100" />
+                <Link href="/insurance" onClick={() => setInsuranceOpen(false)}
+                  className="block px-4 py-2.5 hover:bg-neutral-50 transition-colors">
+                  <p className="text-sm text-neutral-500">All insurance →</p>
+                </Link>
+              </div>
+            )}
+          </div>
+
+          <Link href="/articles" className="hover:text-neutral-900 transition-colors">Learn</Link>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -97,7 +125,6 @@ export default function Navbar() {
           >
             Get Updates
           </Link>
-
           <button
             className="md:hidden p-1.5 text-neutral-600 hover:text-neutral-900 transition-colors"
             onClick={() => setMobileOpen((o) => !o)}
@@ -120,36 +147,50 @@ export default function Navbar() {
               onClick={() => setMobilePropertyOpen((o) => !o)}
             >
               Property
-              <ChevronDown
-                size={14}
-                className={`transition-transform duration-150 ${mobilePropertyOpen ? "rotate-180" : ""}`}
-              />
+              <ChevronDown size={14} className={`transition-transform duration-150 ${mobilePropertyOpen ? "rotate-180" : ""}`} />
             </button>
             {mobilePropertyOpen && (
               <div className="pl-3 flex flex-col border-b border-neutral-100">
                 {PROPERTY_LINKS.map((l) => (
-                  <Link
-                    key={l.href}
-                    href={l.href}
+                  <Link key={l.href} href={l.href}
                     className="py-2.5 text-sm text-neutral-500 hover:text-neutral-900 transition-colors"
-                    onClick={() => setMobileOpen(false)}
-                  >
+                    onClick={() => setMobileOpen(false)}>
                     {l.label}
                   </Link>
                 ))}
               </div>
             )}
 
-            {TOP_LINKS.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className="py-3 text-sm text-neutral-600 hover:text-neutral-900 transition-colors border-b border-neutral-100 last:border-0"
-                onClick={() => setMobileOpen(false)}
-              >
-                {l.label}
-              </Link>
-            ))}
+            {/* Insurance accordion */}
+            <button
+              className="flex items-center justify-between py-3 text-sm text-neutral-600 hover:text-neutral-900 transition-colors border-b border-neutral-100"
+              onClick={() => setMobileInsuranceOpen((o) => !o)}
+            >
+              Insurance
+              <ChevronDown size={14} className={`transition-transform duration-150 ${mobileInsuranceOpen ? "rotate-180" : ""}`} />
+            </button>
+            {mobileInsuranceOpen && (
+              <div className="pl-3 flex flex-col border-b border-neutral-100">
+                {INSURANCE_LINKS.map((l) => (
+                  <Link key={l.href} href={l.href}
+                    className="py-2.5 text-sm text-neutral-500 hover:text-neutral-900 transition-colors"
+                    onClick={() => setMobileOpen(false)}>
+                    {l.label}
+                  </Link>
+                ))}
+                <Link href="/insurance"
+                  className="py-2.5 text-sm text-neutral-400 hover:text-neutral-900 transition-colors"
+                  onClick={() => setMobileOpen(false)}>
+                  All insurance
+                </Link>
+              </div>
+            )}
+
+            <Link href="/articles"
+              className="py-3 text-sm text-neutral-600 hover:text-neutral-900 transition-colors border-b border-neutral-100"
+              onClick={() => setMobileOpen(false)}>
+              Learn
+            </Link>
 
             <Link
               href="/newsletter"

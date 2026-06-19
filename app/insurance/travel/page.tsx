@@ -56,6 +56,9 @@ export default function TravelInsurancePage() {
       </Link>
 
       <h1 className="mt-6 text-3xl font-semibold text-neutral-900">Travel Insurance in Singapore</h1>
+      <Link href="/insurance/travel/rates" className="inline-flex items-center gap-1.5 mt-3 text-sm text-neutral-500 hover:text-neutral-900 transition-colors">
+        Compare travel insurance rates →
+      </Link>
       <p className="mt-4 text-neutral-600 leading-relaxed">
         Travel insurance is inexpensive relative to what it covers — a medical emergency
         abroad can cost tens of thousands of dollars, and a single medical evacuation can

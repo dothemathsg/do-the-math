@@ -60,6 +60,9 @@ export default function LifeInsurancePage() {
       </Link>
 
       <h1 className="mt-6 text-3xl font-semibold text-neutral-900">Life Insurance in Singapore</h1>
+      <Link href="/insurance/life/rates" className="inline-flex items-center gap-1.5 mt-3 text-sm text-neutral-500 hover:text-neutral-900 transition-colors">
+        Compare term life rates →
+      </Link>
       <p className="mt-4 text-neutral-600 leading-relaxed">
         Life insurance exists to replace your income and settle your obligations if you
         can no longer provide for your dependants. In Singapore, the market is regulated

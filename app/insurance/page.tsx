@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Shield, Car, Heart, Home, Plane, Briefcase } from "lucide-react";
+import { Shield, Car, Heart, Home, Plane, Briefcase, ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Insurance Singapore",
@@ -123,6 +123,32 @@ export default function InsurancePage() {
             </Link>
           );
         })}
+      </div>
+
+      {/* Compare rates */}
+      <div className="mt-14">
+        <h2 className="text-lg font-semibold text-neutral-900 mb-1">Compare rates</h2>
+        <p className="text-sm text-neutral-500 mb-5">Side-by-side premiums from all major Singapore insurers.</p>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {[
+            { href: "/insurance/car/rates",    label: "Car Insurance",    sub: "Starting premiums + workshop type" },
+            { href: "/insurance/life/rates",   label: "Life Insurance",   sub: "Monthly premiums, 30yo S$500K term" },
+            { href: "/insurance/home/rates",   label: "Home Insurance",   sub: "Annual premiums, HDB 4-room S$100K" },
+            { href: "/insurance/travel/rates", label: "Travel Insurance", sub: "Per-trip prices, 7-day ASEAN" },
+          ].map((r) => (
+            <Link
+              key={r.href}
+              href={r.href}
+              className="group flex items-center justify-between gap-3 border border-neutral-200 rounded-xl px-4 py-3.5 hover:border-neutral-900 transition-colors"
+            >
+              <div>
+                <p className="text-sm font-medium text-neutral-900">{r.label}</p>
+                <p className="text-xs text-neutral-400 mt-0.5">{r.sub}</p>
+              </div>
+              <ArrowRight size={14} className="text-neutral-300 group-hover:text-neutral-900 transition-colors shrink-0" />
+            </Link>
+          ))}
+        </div>
       </div>
 
       {/* Key principles */}

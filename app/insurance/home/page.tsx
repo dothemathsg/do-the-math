@@ -50,6 +50,9 @@ export default function HomeInsurancePage() {
       </Link>
 
       <h1 className="mt-6 text-3xl font-semibold text-neutral-900">Home Insurance in Singapore</h1>
+      <Link href="/insurance/home/rates" className="inline-flex items-center gap-1.5 mt-3 text-sm text-neutral-500 hover:text-neutral-900 transition-colors">
+        Compare home insurance rates →
+      </Link>
       <p className="mt-4 text-neutral-600 leading-relaxed">
         Many Singapore homeowners believe they're covered because they have the compulsory
         HDB fire insurance policy. They're not — it insures only the original HDB structure,
