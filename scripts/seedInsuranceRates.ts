@@ -117,13 +117,13 @@ const travel = [
     category: "travel", insurer: "MSIG", plan_name: "TravelEasy Standard", tier: "basic",
     price: 28, price_unit: "per-trip", coverage_limit: 250_000, coverage_limit_label: "Medical cover",
     key_features: ["Medical & hospitalisation S$250K", "Trip cancellation S$5K", "Baggage delay S$200/6h", "PA cover S$150K"],
-    quote_url: "https://www.msig.com.sg/personal-insurance/travel-insurance",
+    quote_url: "https://www.msig.com.sg/insurance/personal-insurance",
   },
   {
     category: "travel", insurer: "MSIG", plan_name: "TravelEasy Elite", tier: "standard",
     price: 39, price_unit: "per-trip", coverage_limit: 500_000, coverage_limit_label: "Medical cover",
     key_features: ["Medical & hospitalisation S$500K", "Trip cancellation S$10K", "Baggage delay S$300/6h", "PA cover S$200K"],
-    quote_url: "https://www.msig.com.sg/personal-insurance/travel-insurance",
+    quote_url: "https://www.msig.com.sg/insurance/personal-insurance",
   },
   // ── AXA ──
   {
@@ -171,7 +171,7 @@ const home = [
     category: "home", insurer: "NTUC Income", plan_name: "Enhanced Home Insurance", tier: "standard",
     price: 178, price_unit: "annual", coverage_limit: 100_000, coverage_limit_label: "Contents + renovation",
     key_features: ["Contents S$50K", "Renovation S$50K", "Personal liability S$1M", "Worldwide contents cover"],
-    quote_url: "https://www.income.com.sg/home-insurance",
+    quote_url: "https://www.income.com.sg/enhanced-home-insurance",
   },
   {
     category: "home", insurer: "AXA", plan_name: "SmartHome", tier: "standard",
@@ -183,7 +183,7 @@ const home = [
     category: "home", insurer: "MSIG", plan_name: "Home Protect Plus", tier: "standard",
     price: 198, price_unit: "annual", coverage_limit: 100_000, coverage_limit_label: "Contents + renovation",
     key_features: ["Contents S$50K", "Renovation S$50K", "Personal liability S$1M", "Employer's liability"],
-    quote_url: "https://www.msig.com.sg/personal-insurance/home-insurance",
+    quote_url: "https://www.msig.com.sg/insurance/personal-insurance",
   },
 ];
 
@@ -218,7 +218,7 @@ const life = [
     category: "life", insurer: "Great Eastern", plan_name: "GREAT Term", tier: "standard",
     price: 24, price_unit: "monthly", coverage_limit: 500_000, coverage_limit_label: "Sum assured",
     key_features: ["Death & TPD cover", "20-year term", "Terminal illness benefit", "Renewable at maturity"],
-    quote_url: "https://www.greateasternlife.com/sg/en/personal-insurance/our-products/life-insurance/",
+    quote_url: "https://www.greateasternlife.com/sg/en/personal-insurance/our-products/life-insurance.html",
   },
   {
     category: "life", insurer: "Manulife", plan_name: "ReadyTerm", tier: "standard",
@@ -230,7 +230,7 @@ const life = [
     category: "life", insurer: "Prudential", plan_name: "PRUterm", tier: "standard",
     price: 26, price_unit: "monthly", coverage_limit: 500_000, coverage_limit_label: "Sum assured",
     key_features: ["Death & TPD cover", "20-year term", "Terminal illness benefit", "Convertible to permanent plan"],
-    quote_url: "https://www.prudential.com.sg/products/insurance/life/",
+    quote_url: "https://www.prudential.com.sg/products/life-insurance/term-life-insurance",
   },
 ];
 
@@ -244,7 +244,7 @@ const car = [
     price: 1000, price_unit: "annual", coverage_limit: null, coverage_limit_label: null,
     key_features: ["Comprehensive cover", "Any workshop", "NCB protection available", "24h roadside assistance"],
     workshop_type: "Free choice", excess: 0,
-    quote_url: "https://www.hlassurance.com.sg/car-insurance/",
+    quote_url: "https://www.hlas.com.sg/car-insurance/",
   },
   // Etiqa: plan name corrected to TIQ Comprehensive (Etiqa's online brand); excess S$0
   {
@@ -289,7 +289,7 @@ const car = [
     price: 1200, price_unit: "annual", coverage_limit: null, coverage_limit_label: null,
     key_features: ["Comprehensive cover", "30+ authorised workshops", "NCB protection available", "Personal accident cover"],
     workshop_type: "Authorised", excess: 500,
-    quote_url: "https://www.msig.com.sg/personal-insurance/motor-insurance",
+    quote_url: "https://www.msig.com.sg/insurance/personal-insurance",
   },
   {
     category: "car", insurer: "AXA", plan_name: "Motor Comprehensive", tier: "standard",
@@ -303,7 +303,7 @@ const car = [
     price: 1300, price_unit: "annual", coverage_limit: null, coverage_limit_label: null,
     key_features: ["Comprehensive cover", "Authorised workshops", "NCB protection available", "Lifetime repair guarantee"],
     workshop_type: "Authorised", excess: 600,
-    quote_url: "https://www.income.com.sg/car-insurance",
+    quote_url: "https://www.income.com.sg/drivo-car-insurance",
   },
   // DirectAsia: workshop corrected to Authorised; excess corrected to S$0
   {
