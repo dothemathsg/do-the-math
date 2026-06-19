@@ -3,6 +3,7 @@ import Link from "next/link";
 import ResearchButton from "./ResearchButton";
 import WriteButton from "./WriteButton";
 import ScheduleForm from "./ScheduleForm";
+import RatesReviewSection from "./RatesReviewSection";
 import { approvePlan, rejectPlan, deleteDraft } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -257,6 +258,9 @@ export default async function AdminPage() {
           </div>
         </section>
       )}
+
+      {/* Rates Review */}
+      <RatesReviewSection />
 
       {/* Analytics */}
       <section>
