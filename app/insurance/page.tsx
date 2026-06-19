@@ -17,18 +17,18 @@ export const metadata: Metadata = {
 
 const TYPES = [
   {
-    href: "/insurance/car",
-    icon: Car,
-    label: "Car Insurance",
-    desc: "Mandatory for all vehicle owners in Singapore. We break down comprehensive vs third-party cover, NCB, and how to compare quotes.",
-    tags: ["Comprehensive", "Third-party", "NCB"],
-  },
-  {
     href: "/insurance/life",
     icon: Heart,
     label: "Life Insurance",
     desc: "Term, whole life, and investment-linked policies. Understand how much cover you actually need and what MAS rules apply.",
     tags: ["Term", "Whole life", "ILP", "Critical illness"],
+  },
+  {
+    href: "/insurance/car",
+    icon: Car,
+    label: "Car Insurance",
+    desc: "Mandatory for all vehicle owners in Singapore. We break down comprehensive vs third-party cover, NCB, and how to compare quotes.",
+    tags: ["Comprehensive", "Third-party", "NCB"],
   },
   {
     href: "/insurance/home",
@@ -131,8 +131,8 @@ export default function InsurancePage() {
         <p className="text-sm text-neutral-500 mb-5">Side-by-side premiums from all major Singapore insurers.</p>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {[
-            { href: "/insurance/car/rates",    label: "Car Insurance",    sub: "Starting premiums + workshop type" },
             { href: "/insurance/life/rates",   label: "Life Insurance",   sub: "Monthly premiums, 30yo S$500K term" },
+            { href: "/insurance/car/rates",    label: "Car Insurance",    sub: "Starting premiums + workshop type" },
             { href: "/insurance/home/rates",   label: "Home Insurance",   sub: "Annual premiums, HDB 4-room S$100K" },
             { href: "/insurance/travel/rates", label: "Travel Insurance", sub: "Per-trip prices, 7-day ASEAN" },
           ].map((r) => (

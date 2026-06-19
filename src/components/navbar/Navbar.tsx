@@ -7,12 +7,12 @@ import { Menu, X, ChevronDown } from "lucide-react";
 const PROPERTY_LINKS = [
   { href: "/mortgage-rates", label: "Mortgage Rates", desc: "Live rates from major banks" },
   { href: "/property-prices", label: "Property Prices", desc: "Latest transaction data by district" },
-  { href: "/calculator", label: "Stamp Duty Calculator", desc: "BSD & ABSD calculator" },
+  { href: "/calculator", label: "Mortgage & Stamp Duty Calculator", desc: "BSD & ABSD calculator" },
 ];
 
 const INSURANCE_LINKS = [
-  { href: "/insurance/car",       label: "Car Insurance",       desc: "Comprehensive plans & rates" },
   { href: "/insurance/life",      label: "Life Insurance",      desc: "Term life plans & rates" },
+  { href: "/insurance/car",       label: "Car Insurance",       desc: "Comprehensive plans & rates" },
   { href: "/insurance/home",      label: "Home Insurance",      desc: "HDB & condo cover & rates" },
   { href: "/insurance/travel",    label: "Travel Insurance",    desc: "Single trip & annual plans" },
   { href: "/insurance/corporate", label: "Corporate Insurance", desc: "WICA, group health & more" },
