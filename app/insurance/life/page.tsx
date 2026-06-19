@@ -158,6 +158,22 @@ export default function LifeInsurancePage() {
           ))}
         </ul>
       </div>
+
+      {/* Compare CTA */}
+      <div className="mt-10 border border-neutral-200 rounded-xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <p className="font-semibold text-neutral-900">Ready to compare?</p>
+          <p className="mt-1 text-sm text-neutral-500">
+            Monthly premiums from Singlife, FWD, AIA, NTUC Income, Great Eastern, Manulife, and Prudential.
+          </p>
+        </div>
+        <Link
+          href="/insurance/life/rates"
+          className="shrink-0 inline-flex items-center gap-1.5 bg-neutral-900 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-neutral-700 transition-colors"
+        >
+          Compare term life rates →
+        </Link>
+      </div>
     </div>
   );
 }

@@ -179,6 +179,60 @@ export type Database = {
         };
         Relationships: [];
       };
+      insurance_rates: {
+        Row: {
+          id: string;
+          category: string;
+          insurer: string;
+          plan_name: string;
+          tier: string;
+          price: number;
+          price_unit: string;
+          coverage_limit: number | null;
+          coverage_limit_label: string | null;
+          key_features: string[];
+          excess: number | null;
+          workshop_type: string | null;
+          quote_url: string | null;
+          is_active: boolean;
+          last_updated: string;
+        };
+        Insert: {
+          id?: string;
+          category: string;
+          insurer: string;
+          plan_name: string;
+          tier: string;
+          price: number;
+          price_unit: string;
+          coverage_limit?: number | null;
+          coverage_limit_label?: string | null;
+          key_features?: string[];
+          excess?: number | null;
+          workshop_type?: string | null;
+          quote_url?: string | null;
+          is_active?: boolean;
+          last_updated?: string;
+        };
+        Update: {
+          id?: string;
+          category?: string;
+          insurer?: string;
+          plan_name?: string;
+          tier?: string;
+          price?: number;
+          price_unit?: string;
+          coverage_limit?: number | null;
+          coverage_limit_label?: string | null;
+          key_features?: string[];
+          excess?: number | null;
+          workshop_type?: string | null;
+          quote_url?: string | null;
+          is_active?: boolean;
+          last_updated?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       district_summary: {

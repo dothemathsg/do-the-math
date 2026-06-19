@@ -126,6 +126,22 @@ export default function HomeInsurancePage() {
           actual renovation cost and update it after any future works.
         </p>
       </div>
+
+      {/* Compare CTA */}
+      <div className="mt-10 border border-neutral-200 rounded-xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <p className="font-semibold text-neutral-900">Ready to compare?</p>
+          <p className="mt-1 text-sm text-neutral-500">
+            Annual premiums from DirectAsia, FWD, Etiqa, NTUC Income, AXA, MSIG and more — HDB 4-room reference basis.
+          </p>
+        </div>
+        <Link
+          href="/insurance/home/rates"
+          className="shrink-0 inline-flex items-center gap-1.5 bg-neutral-900 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-neutral-700 transition-colors"
+        >
+          Compare home insurance rates →
+        </Link>
+      </div>
     </div>
   );
 }
