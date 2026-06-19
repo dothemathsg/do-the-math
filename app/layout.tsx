@@ -13,28 +13,28 @@ const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.dothemath.sg"),
   title: {
-    default: "Do The Math — Singapore Property & Mortgage Tools",
+    default: "Do The Math — Singapore Personal Finance",
     template: "%s | Do The Math",
   },
   description:
-    "Singapore's property finance platform. Compare live mortgage rates, calculate BSD & ABSD stamp duty, explore property prices by district, and learn with expert guides.",
-  keywords: ["Singapore mortgage rates", "HDB BTO", "stamp duty calculator", "ABSD", "BSD", "property prices Singapore", "SORA home loan"],
+    "Singapore's personal finance platform. Compare mortgage rates, calculate stamp duty, track property prices, and make smarter decisions across every major financial milestone.",
+  keywords: ["Singapore personal finance", "mortgage rates Singapore", "stamp duty calculator", "ABSD", "BSD", "property prices Singapore", "SORA home loan", "HDB BTO"],
   authors: [{ name: "Do The Math", url: "https://www.dothemath.sg" }],
   openGraph: {
     type: "website",
     locale: "en_SG",
     url: "https://www.dothemath.sg",
     siteName: "Do The Math",
-    title: "Do The Math — Singapore Property & Mortgage Tools",
+    title: "Do The Math — Singapore Personal Finance",
     description:
-      "Compare live mortgage rates, calculate stamp duty, explore property prices by district, and make smarter property decisions in Singapore.",
+      "Singapore's personal finance platform. Compare mortgage rates, calculate stamp duty, track property prices, and make smarter financial decisions.",
     images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "Do The Math" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Do The Math — Singapore Property & Mortgage Tools",
+    title: "Do The Math — Singapore Personal Finance",
     description:
-      "Compare live mortgage rates, calculate stamp duty, explore property prices by district, and make smarter property decisions in Singapore.",
+      "Singapore's personal finance platform. Compare mortgage rates, calculate stamp duty, track property prices, and make smarter financial decisions.",
     images: ["/og-default.png"],
   },
   robots: { index: true, follow: true },

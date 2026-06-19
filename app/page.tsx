@@ -6,14 +6,14 @@ import type { Metadata } from "next";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Do The Math — Singapore Property & Mortgage Tools",
+  title: "Do The Math — Singapore Personal Finance",
   description:
-    "Compare live Singapore mortgage rates from DBS, OCBC, UOB and more. Calculate stamp duty (BSD & ABSD), explore property prices by district, and read expert guides.",
+    "Singapore's personal finance platform. Compare mortgage rates, calculate stamp duty, track property prices, and make smarter financial decisions — no jargon, no conflict of interest.",
   alternates: { canonical: "https://www.dothemath.sg" },
   openGraph: {
-    title: "Do The Math — Singapore Property & Mortgage Tools",
+    title: "Do The Math — Singapore Personal Finance",
     description:
-      "Compare live Singapore mortgage rates from DBS, OCBC, UOB and more. Calculate stamp duty (BSD & ABSD), explore property prices by district, and read expert guides.",
+      "Singapore's personal finance platform. Compare mortgage rates, calculate stamp duty, track property prices, and make smarter financial decisions.",
     url: "https://www.dothemath.sg",
   },
 };
@@ -27,7 +27,7 @@ const websiteJsonLd = {
   "@type": "WebSite",
   name: "Do The Math",
   url: "https://www.dothemath.sg",
-  description: "Singapore property finance platform — mortgage rates, stamp duty calculator, property prices.",
+  description: "Singapore personal finance platform — mortgage rates, stamp duty calculator, property prices, insurance, and investments.",
   potentialAction: {
     "@type": "SearchAction",
     target: { "@type": "EntryPoint", urlTemplate: "https://www.dothemath.sg/articles?q={search_term_string}" },
