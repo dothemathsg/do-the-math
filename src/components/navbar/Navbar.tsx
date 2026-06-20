@@ -5,7 +5,6 @@ import { useState, useRef } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 
 const PROPERTY_LINKS = [
-  { href: "/mortgage-rates", label: "Mortgage Rates", desc: "Live rates from major banks" },
   { href: "/property-prices", label: "Property Prices", desc: "Latest transaction data by district" },
   { href: "/calculator", label: "Mortgage & Stamp Duty Calculator", desc: "BSD & ABSD calculator" },
 ];

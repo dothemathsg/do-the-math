@@ -8,13 +8,7 @@ export const metadata: Metadata = {
   title: "Singapore Mortgage Rates — DBS, OCBC, UOB, Standard Chartered",
   description:
     "Compare the latest SORA-linked and fixed home loan rates from Singapore's major banks. Updated regularly so you always see current pricing.",
-  alternates: { canonical: "https://www.dothemath.sg/mortgage-rates" },
-  openGraph: {
-    title: "Singapore Mortgage Rates — DBS, OCBC, UOB, Standard Chartered",
-    description:
-      "Compare the latest SORA-linked and fixed home loan rates from Singapore's major banks. Updated regularly so you always see current pricing.",
-    url: "https://www.dothemath.sg/mortgage-rates",
-  },
+  robots: { index: false, follow: false },
 };
 
 function monthHeading() {

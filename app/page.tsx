@@ -1,6 +1,4 @@
 import Hero from "@/components/home/Hero";
-import MortgageTable from "@/components/mortgage/MortgageTable";
-import { Suspense } from "react";
 import type { Metadata } from "next";
 
 export const revalidate = 3600;
@@ -17,10 +15,6 @@ export const metadata: Metadata = {
     url: "https://www.dothemath.sg",
   },
 };
-
-function monthHeading() {
-  return new Date().toLocaleDateString("en-SG", { month: "long", year: "numeric" });
-}
 
 const websiteJsonLd = {
   "@context": "https://schema.org",
@@ -40,20 +34,6 @@ export default function Home() {
     <div className="space-y-16 py-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       <Hero />
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold text-neutral-900">
-          Mortgage Rates in {monthHeading()}
-        </h2>
-        <Suspense
-          fallback={
-            <div className="border border-neutral-200 rounded-lg p-8 text-sm text-neutral-400">
-              Loading rates…
-            </div>
-          }
-        >
-          <MortgageTable />
-        </Suspense>
-      </section>
     </div>
   );
 }
