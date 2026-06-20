@@ -6,6 +6,11 @@ import { scrapeDBS } from "./banks/dbs";
 import { scrapeOCBC } from "./banks/ocbc";
 import { scrapeUOB } from "./banks/uob";
 import { scrapeStandardChartered } from "./banks/sc";
+import { scrapeBOC } from "./banks/boc";
+import { scrapeCIMB } from "./banks/cimb";
+import { scrapeCitibank } from "./banks/citibank";
+import { scrapeHSBC } from "./banks/hsbc";
+import { scrapeMaybank } from "./banks/maybank";
 import type { MortgageRateInsert } from "./types";
 
 function createSupabaseClient() {
@@ -20,10 +25,15 @@ async function main() {
   const supabase = createSupabaseClient();
 
   const scrapers: Array<{ name: string; fn: () => Promise<MortgageRateInsert[]> }> = [
-    { name: "DBS",              fn: scrapeDBS },
-    { name: "OCBC",             fn: scrapeOCBC },
-    { name: "UOB",              fn: scrapeUOB },
+    { name: "DBS",                fn: scrapeDBS },
+    { name: "OCBC",               fn: scrapeOCBC },
+    { name: "UOB",                fn: scrapeUOB },
     { name: "Standard Chartered", fn: scrapeStandardChartered },
+    { name: "Bank of China",      fn: scrapeBOC },
+    { name: "CIMB",               fn: scrapeCIMB },
+    { name: "Citibank",           fn: scrapeCitibank },
+    { name: "HSBC",               fn: scrapeHSBC },
+    { name: "Maybank",            fn: scrapeMaybank },
   ];
 
   const rates: MortgageRateInsert[] = [];
